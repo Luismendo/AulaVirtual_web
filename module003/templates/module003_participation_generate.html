@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+                {% for course in all_courses_formated %}
+                <li><a href="{{url_for('module003.module003_course', course_id=course.id)}}">{{ course.name }}</a></li>
+                {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+<div class="container">
+
+       <form class="form-signin" method="POST" action="{{url_for('module003.module003_participation_generate')}}">
+        {{ form.hidden_tag() }}
+    	{{ wtf.form_field(form.id,readonly="readonly") }}
+    	{{ wtf.form_field(form.course_id) }}
+    	{{ wtf.form_field(form.activity_name) }}
+    	{{ wtf.form_field(form.activity_description) }}
+    	{{ wtf.form_field(form.date_expire) }}
+    	{{ wtf.form_field(form.time_expire) }}
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit"> Create or Update Activity </button>
+       </form>
+
+        <br>
+          <div class="table-responsive">
+            <table id="myTable" class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Edit</th>
+                  <th>Course Name</th>
+                  <th>Activity Name</th>
+                  <th>Description</th>
+                  <th>Expiring Date</th>
+                  <th>Date Created</th>
+                  <th>Date Modified</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in rows %}
+                <tr>
+
+                   <td> <a><form action="{{url_for('module003.module003_participation_generate')}}" method="GET">
+                       <input type="submit" value={{ row.Actividad.id }} name="rowid">
+                   </form> </a></td>
+                    <td>{{ row.Course.name }}</td>
+                    <td>{{ row.Actividad.activity_name }}</td>
+                    <td>{{ row.Actividad.activity_description }}</td>
+                    <td>{{ row.Actividad.date_expire }}</td>
+                    <td>{{ row.Actividad.date_created }}</td>
+                    <td>{{ row.Actividad.date_modified }}</td>
+
+
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+    </div>
+
+{% endblock %}

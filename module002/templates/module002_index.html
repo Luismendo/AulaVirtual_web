@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-2 sidebar" style="height:100vh">
+          <ul class="nav nav-sidebar">
+                {% for row in rows %}
+                    <li><a href={{url_for('module002.module002_forum',course_id=row.course_id)}}>Curso: {{ row.course_name }}</a></li>
+                {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+{% endblock %}

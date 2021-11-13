@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+
+            {% for activity in all_activities_formated %}
+
+                <li><a href="{{url_for('module003.module003_activity', course_id=course_id, activity_id=activity.id)}}">{{ activity.name }}</a></li>
+
+            {% endfor %}
+
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% block content1 %}
+    {% endblock %}
+{% endblock %}
+

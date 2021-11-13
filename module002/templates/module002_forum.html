@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-md-2 sidebar" style="height:100vh">
+              <ul class="nav nav-sidebar">
+                    {% for follow in followed %}
+                        <li><a href="{{ url_for('module002.module002_forum', course_id=follow.course_id) }}">Curso: {{ follow.course_name }}</a></li>
+                    {% endfor %}
+              </ul>
+            </div>
+
+            <div class="col-md-9 list-group-item">
+                <form style="margin-bottom:3vh;" method="POST" action="{{ url_for('module002.module002_forum', course_id=course_id) }}">
+                    <div class="form-group">
+                        {{ form.hidden_tag() }}
+                        {{ wtf.form_field(form.comment, style='resize:vertical;') }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Comentar</button>
+                </form>
+
+                {% for msg in msgs | reverse %}
+                    {% if (msg.user_id == user.id) or msg.shows %}
+                        <div class="list-group">
+                            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h3 class="mb-1">
+                                        <img src="../static/{{users[msg.user_id].img_name}}.png" width="50" height="50">
+                                        {{ users[msg.user_id].username }}
+                                    </h3>
+                                </div>
+                                <p class="text-break" style="overflow-wrap: anywhere;">{{ msg.comment }}</p>
+                                <small>{{ msg.date_created.strftime('Publicado el %d %h %Y a las %H:%Mh ') + (msg.date_created.tzinfo or 'UTC') }}</small>
+
+                                <form>
+                                    {% if msg.user_id == user.id %}
+                                        <div class="form-check">
+                                            {% if msg.shows %}
+                                                <input type="checkbox" class="form-check-input" id="{{msg.id}}" value="{{msg.shows}}">
+                                            {% else %}
+                                                <input type="checkbox" class="form-check-input" id="{{msg.id}}" checked>
+                                            {% endif %}
+                                            <label class="form-check-label" for="exampleCheck1">Hide Commentary</label>
+                                        </div>
+                                    {% endif %}
+                                </form>
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+         </div>
+    </div>
+
+    <script>
+        $(document).on("click",'.form-check-input', function(){
+            let hide_comment = $(this).is(':checked');
+            let comment_id = $(this).attr('id');
+            $.ajax({
+                type: "POST",
+                url: '/blog/change',
+                data: {
+                    show_comment:hide_comment,
+                    comment_id:comment_id
+                }, //--> send id of checked checkbox on other page
+                success: function(data) {
+                    if(hide_comment){
+                        alert("El comentario ahora está oculto");
+                    }else{
+                        alert("El comentario ahora está visible para todos");
+                    }
+
+                }
+            });
+        });
+    </script>
+
+{% endblock %}

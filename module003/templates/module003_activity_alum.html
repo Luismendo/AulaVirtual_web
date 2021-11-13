@@ -1,0 +1,58 @@
+{% extends 'bases/base_course.html' %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content1 %}
+<h3>Lista de archivos entregados</h3>
+<ul>
+    {% for files in files_list %}
+
+        <li><a href="{{url_for('module003.download', filename=files)}}">{{ files }}</a></li>
+
+    {% endfor %}
+</ul>
+<div class="upload">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Select Files</h1>
+                <div style="position: relative; height: 275px;">
+                    <form method="POST" enctype="multipart/form-data" action="{{url_for('module003.module003_activity', course_id=course_id, activity_id=activity_id)}}">
+                        {{ form.hidden_tag() }}
+        	            {{ wtf.form_field(form.content) }}
+        	            {{ wtf.form_field(form.nota, readonly="readonly") }}
+                      <div class="formUp">
+                        <input type="file" name="files[]" id="file" multiple="multiple">
+                      <ul class="choosen list-group list-group-flush"></ul>
+                      <p class="guide">Click here to upload files.</p>
+                      </div>
+                      </input>
+                        <input type="submit" value="Upload Files" name="submitUpload" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    var applyFiles = function() {
+      if (this.files.length <= 0) {
+        $('.guide').show();
+      } else {
+        $('.choosen').empty();
+        $('.guide').hide();
+        for (var i = 0; i < this.files.length; ++i) {
+          $('.choosen').append($('<li class="list-group-item">').html(this.files[i].name));
+        }
+      }
+    }
+
+    $('input[type="file"]').each(function() {
+      applyFiles.call(this);
+    }).change(function() {
+      applyFiles.call(this);
+    });
+</script>
+
+{% endblock %}

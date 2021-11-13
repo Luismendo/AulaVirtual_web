@@ -1,0 +1,84 @@
+{% extends 'bases/base_course.html' %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content1 %}
+<div class="container col-lg-12">
+    <h3>Lista de entregas de alumnos</h3>
+    <table id="table" class="table" style="width:100%"></table>
+</div>
+<script>
+var all_entregas = {{all_entregas_formated | tojson}}
+
+var act = {{act | tojson }}
+
+console.log(all_entregas)
+console.log(act)
+const entregas_url = "{{url_for('module003.download', filename="file")}}";
+
+let table = document.getElementById('table'),
+        headers = ['alumno', 'descripcion', 'archivos', 'nota','Fecha de Entrega','Fecha de Modificacion'],
+        headerRow = table.createTHead().insertRow();
+
+    headers.forEach(headerText => {
+        let header = document.createElement('th');
+        let textNode = document.createTextNode(headerText);
+        header.appendChild(textNode);
+        headerRow.appendChild(header);
+    });
+
+    var tableBody = document.createElement('tbody');
+    all_entregas.forEach(entrega => {
+        nota = document.createElement('input');
+        nota.setAttribute('type', 'number');
+        nota.setAttribute('min', 0);
+        nota.setAttribute('max', 10);
+        nota.setAttribute('step', 0.1);
+        nota.setAttribute('value', entrega.nota);
+        nota.setAttribute('class', "nota");
+        nota.setAttribute('id', entrega.user_id);
+        nota.setAttribute('name', entrega.act_id);
+        let row = tableBody.insertRow(),
+            ul = document.createElement('ul');
+            entrega.files_list.forEach(file => {
+                li = document.createElement('li');
+                a = document.createElement('a');
+                a.href = entregas_url.replace('file', file);
+                a.appendChild(document.createTextNode(file));
+                li.appendChild(a);
+                ul.appendChild(li);
+            })
+
+        row.insertCell().appendChild(document.createTextNode(entrega.user_name));
+        row.insertCell().appendChild(document.createTextNode(entrega.content));
+        row.insertCell().appendChild(ul);
+        row.insertCell().appendChild(nota);
+        var text = document.createTextNode(entrega.fecha_entrega)
+        var container = document.createElement("span");
+        container.appendChild(text);
+        if(entrega.fecha_entrega<=act.expire_date){
+            container.style.color = "red";
+        }
+        row.insertCell().appendChild(container);
+        if(entrega.fecha_entrega == entrega.fecha_modificacion ){
+            row.insertCell().appendChild(document.createTextNode("La tarea no ha sido modificada"));
+        }else{
+            row.insertCell().appendChild(document.createTextNode(entrega.fecha_modificacion));
+            }
+
+    });
+table.appendChild(tableBody);
+
+
+  $('.nota').on('change',function(){
+    $.ajax({
+       type: "POST",
+       url: "{{url_for('module003.nota')}}",
+        contentType: 'application/json;charset=UTF-8',
+       data : $(this).val()+"_"+$(this).attr("name")+"_"+$(this).attr("id")
+     });
+  });
+
+</script>
+
+{% endblock %}
